@@ -90,6 +90,14 @@ function generateTree($dir, $repoRoot, $prefix = '', $isLast = true, $maxDepth =
             return false;
         }
 
+        // Skip commonly verbose/boilerplate directories at root level
+        if ($dir === $repoRoot) {
+            $skipDirs = ['database', 'public', 'storage', 'bootstrap', 'config'];
+            if (in_array($item, $skipDirs)) {
+                return false;
+            }
+        }
+
         $itemPath = "$dir/$item";
         // Calculate relative path from repo root
         $relativePath = str_replace(rtrim($repoRoot, '/').'/', '', $itemPath);
@@ -271,6 +279,7 @@ function getTestFeatures($repoPath, $useLlm = false)
     }
 
     $featureList = implode("\n", array_unique($features));
+    print_r($featureList);
 
     if ($useLlm) {
         $prompt = <<<PROMPT
