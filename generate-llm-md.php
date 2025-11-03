@@ -282,7 +282,6 @@ function getTestFeatures($repoPath, $useLlm = false)
     }
 
     $featureList = implode("\n", array_unique($features));
-    print_r($featureList);
 
     if ($useLlm) {
         $prompt = <<<PROMPT
