@@ -257,20 +257,23 @@ function getTestFeatures($repoPath, $useLlm = false)
         if ($file->isFile() && $file->getExtension() === 'php') {
             $content = file_get_contents($file->getPathname());
 
-            // Match test method names
-            preg_match_all('/public function (test_[a-zA-Z0-9_]+)/', $content, $matches);
+            // Match any public function (treating all as tests)
+            preg_match_all('/public function ([a-zA-Z0-9_]+)/', $content, $matches);
             foreach ($matches[1] as $testName) {
-                // Convert test_user_can_export_to_csv to "User can export to CSV"
-                $feature = str_replace('test_', '', $testName);
-                $feature = str_replace('_', ' ', $feature);
+                // Skip setUp/tearDown and other common PHPUnit lifecycle methods
+                if (in_array($testName, ['setUp', 'tearDown', 'setUpBeforeClass', 'tearDownAfterClass'])) {
+                    continue;
+                }
+                // Convert snake_case to sentence case
+                $feature = str_replace('_', ' ', $testName);
                 $feature = ucfirst($feature);
                 $features[] = $feature;
             }
 
-            // do the same for Pest style tests
-            preg_match_all('/it\([\'"](.*?)[\'"],\s*function\s*\(\)\s*\{/s', $content, $pestMatches);
-            if (! empty($pestMatches[1])) {
-                foreach ($pestMatches[1] as $testName) {
+            // do the same for Pest style tests (both it() and test() styles)
+            preg_match_all('/(it|test)\([\'"](.*?)[\'"],\s*function\s*\(\)\s*\{/s', $content, $pestMatches);
+            if (! empty($pestMatches[2])) {
+                foreach ($pestMatches[2] as $testName) {
                     $feature = ucfirst($testName);
                     $features[] = $feature;
                 }
