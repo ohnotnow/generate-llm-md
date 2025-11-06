@@ -338,6 +338,10 @@ function summarizeReadme($repoPath, $useLlm = false)
 
     $readmeContent = file_get_contents($readmeFile);
 
+    if (str_contains($readmeContent, 'Laravel is a web application framework with expressive')) {
+        return "Only Laravel stub readme found";
+    }
+
     if ($useLlm) {
         $prompt = <<<PROMPT
 You are helping create concise documentation for a code repository.
