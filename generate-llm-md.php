@@ -192,7 +192,7 @@ function callOpenAi(string $prompt): ?string
             'Authorization: Bearer '.$apiKey,
         ],
         CURLOPT_POSTFIELDS => json_encode([
-            'model' => 'gpt-5-nano',
+            'model' => 'gpt-5.1',
             'input' => $prompt,
             'reasoning' => ['effort' => 'low'],
         ]),
